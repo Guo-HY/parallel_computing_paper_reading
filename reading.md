@@ -22,12 +22,6 @@ The problem of cache coherence in shared-memory multiprocessors has been address
 
 
 
-## 《论文2》
-
-概述
-
-
-
 ## An_Adaptive_Cache_Coherence_Protocol_Optimized_for_Producer-Consumer_Sharing
 
 ### 翻译
@@ -68,3 +62,28 @@ We find that the mechanisms proposed in this paper reduce the average remote mis
 
 Finally, we use Murphi to verify that each mechanism is error-free and does not violate 
 sequential consistency.
+
+
+
+## Using Preditcion to Accelerate Coherence Protocols
+
+#### Abstract
+
+大多数共享内存的多核系统都采用目录式协议(*directory protocols*)为维护缓存一致性. 为了改善这个延迟, 研究者针对特定共享模式(例如*producer-consumer*, *read-modify-write*)来对一致性协议进行优化. 该文章力求使用检测一致性活动并且触发合适动作的预测逻辑 来代替上述直接的优化方案. 
+
+该篇文章开创了通过预测(维护和评估*Cosmos*一致性消息预测器)来加速cache一致性协议的先河, 其沿用并扩展*Yeh and Patt's two-level PAp branch predictor*的思路, 来预测下一条发送至缓存块的一致性消息(*coherence message*)的消息来源和种类. 对于跑在16核多处理器的五个科学计算应用, *Cosmos*的预测成功率达到62%~93%.  这正是由于缓存块稳定的共享模式所发出的可预测一致性消息信号, *Cosmos*才会有如此高的预测正确率. 
+
+#### Conclusions
+
+该文章探索了通过预测来加速一致性协议的一种方案. 如果可以预测出未来的一致性协议动作并可以提前执行, 则整个系统将会更快执行. 
+
+该文章的第一个贡献在于*Cosmos*一致性消息预测器的设计. Cosmos使用类似于*Yeh and Patt's two-level PAp branch predictor*, 来预测下一条<处理器号, 消息种类>二元组. Cosmos所面临的更大挑战在于上述预测元组是多位的(*multi-bit*). 
+
+该文章的第二个贡献在于提出一套详尽的对Comos预测器的效果评估方案. 在16核多处理器共享内存系统的目标机上, 使用5套科学基准来跑Stache directory protocol, Cosmos(及其几种变种)的预测成功率达到了惊人的62~69%(barnes), 84~86%(modlyn), 84~85(appbt)， 74~92%(unstructured), 和 84~93%(dsmc). 
+
+Comos的高预测率源自于 与特定缓存块地址相关的一致性信号的可预测性. 共享模式所发出的信号在在程序执行过程中可能不会出现变化或变化程度较小. Cosmos比直接优化方案(*directed optimizations*)更加普适. 并且由于Cosmos所使用的资源更少, 其成本也更低. 
+
+不过还需要进一步确定Cosmos如此高的预测率是否能真的减少执行时间. 该工作类似于将高预测率的分支预测器嵌入到微体系结构来更真实的评估预测器价值. 
+
+
+
