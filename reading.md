@@ -28,7 +28,7 @@ The problem of cache coherence in shared-memory multiprocessors has been address
 
 
 
-## 《论文3》
+## An_Adaptive_Cache_Coherence_Protocol_Optimized_for_Producer-Consumer_Sharing
 
 ### 翻译
 
