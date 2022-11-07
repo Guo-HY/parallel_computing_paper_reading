@@ -2,29 +2,116 @@
 
 ## An Evaluation of Directory Schemes for Cache Coherence
 
-#### notes
+### notes
 
 这篇文章主要对比了目录式协议和广播/侦听协议，并且认为大型多处理器系统中目录式协议更有效率，而且更有可扩展性。
 
 这篇文章使用的性能评估方法是trace模拟。
 
-#### Abstract
+### Abstract
 
 The problem of cache coherence in shared-memory multiprocessors has been addressed using two basic approaches: directory schemes and snoopy cache schemes. Directory schemes have been given less attention in the past several years, while snoopy cache methods have become extremely popular. Directory schemes for cache coherence are potentially attractive in large multiprocessor systems that are beyond the scaling limits of the snoopy cache schemes. Slight modifications to directory schemes can make them competitive in performance with snoopy cache schemes for small multiprocessors. Trace driven simulation, using data collected from several real multiprocessor applications, is used to compare the performance of standard directory schemes, modifications to these schemes, and snoopy cache protocols.
 
 共享内存多处理器中的缓存一致性问题已使用两种基本方法解决：目录式方案和广播/侦听方案。在过去的几年里，目录方案很少受到关注，而 广播/侦听方法已经变得非常流行。用于缓存一致性的目录方案在超出广播/侦听 缓存方案的扩展限制的大型多处理器系统中具有潜在的吸引力。对目录方案的轻微修改可以使它们在性能上与小型多处理器的广播/侦听缓存方案具有竞争力。跟踪驱动的模拟，使用从几个真实的多处理器应用程序收集的数据，用于比较标准目录方案、对这些方案的修改和 snoopy 缓存协议的性能。
 
-#### Conclusions
+### Conclusions
 
 这篇文章展示了在大型多处理器系统中使用目录式缓存一致性方案提供共享内存模型是一种值得研究的方法。目录式方案在去掉广播/侦听方案的主要限制-广播操作的同时，在处理缓存一致性中可以获得和广播/侦听方案相近的效率。目录所需要的带宽长期以来被认为是潜在的瓶颈，然而这篇文章展示了目录所需要的带宽远没有内存需要的带宽多。对内存和目录的带宽的基本限制可以通过将它们分散到多个处理器板上来缓解。这种技术允许目录和内带宽随着处理器数量增加而增长。
 
 我们使用trace驱动的模拟在小型多处理器系统上评估了目录方案的性能。目录式方案的性能相比广播/侦听方案很有竞争力。另外仿真还显示出大多数被写入的块都集中在少数cache上，这使得广播操作很低效。这个结果显示目录式方案是高效的。在大型多处理器系统中使用目录式方案来提供共享内存模型将会取得很高的效率。
 
+### Introduction
+
+简略介绍了一下广播/侦听式缓存一致性协议与目录式缓存一致性协议。
+
+广播/侦听式缓存一致性协议的特点是所有的需要别的cache的状态变化或者从别的cache获取数据的事务都需要在总线上进行广播。
+
+广播/侦听式缓存一致性协议在小型多处理器系统上很流行，因为很方便。然而扩展到大型多处理器系统的可扩展性不好。同时这种协议影响着处理器与cache之间的带宽。
+
+在这篇文章中我们指出目录式缓存一致性协议更适合构建大型多处理器系统。这篇文章首次使用来自真实处理器的trace来评估目录式缓存一致性协议。
+
+### Directory Schemes for Cache Consistency
+
+广播侦听协议主要缺点：
+
+- 依赖总线，可扩展性弱
+
+- 竞争处理器-cache之间的带宽
+
+目录式协议相对于广播侦听协议的主要优点：
+
+- 拥有共享数据块的缓存的地址是已知的，这意味着可以进行点对点通信，而不用广播。
+
+#### 一些广播/侦听式协议
+
+##### Tang's method
+
+允许干净的块存在于多个cache中，但是不允许脏块存在于多于一个块中。每个cache中对每一个块保存一个dirty位。位于内存中的中央目录保存所有cache中块的tags和dirty位的拷贝。
+
+##### Censier and Feautrier
+
+感觉就是全位向量模式的Tang's method
+
+#### 对广播/侦听式协议的分类法
+
+$$
+Dir_iX
+$$
+
+- i表示对于一个块在目录中可以存放的处理器索引个数
+- X是B或NB。对于NB，i一定大于等于系统中处理器个数。
+
+目录式协议有两个潜在的可扩展性相关的困难：
+
+- 如果需要经常性的广播，那么性能一定不如广播/侦听式更好。
+- 对目录的访问可能称为潜在的瓶颈。
+
+
+
+### Evaluation Methodology
+
+使用多处理器系统的内存访问trace。这样做的缺点是一种trace被用来评估所有的缓存一致性协议，然而由于不同的协议有不同的行为，在现实中对于同一个程序它们产生的trace大概利率是不同的。但是这种trace至少反映了真实程序的一种可能的内存trace，因此可以准确区分不同缓存一致性协议之间的性能。
+
+同时消除了trace中cache冷启动带来的缺失。因此就剩下两种cache缺失了：
+
+- 访问数据的缺失
+- 由于一致性操作造成的缺失
+
+我们希望只评估一致性操作对多处理器间交流于内存访问带宽的影响，因此假定cache无限大。
+
+#### Performance Measures
+
+我们希望评估的性能不依赖于特定的处理器架构或者互联网络结构。因此我们使用内存访问代价作为基本的评价标准。这个代价就是每一次数据传输需要花费的时钟周期。
+
+
+
+## An Economical Solution to the Cache Coherence Problem 
+
+### Abstract
+
+在本文中，我们回顾并定性地评估了在紧密耦合的多处理器系统中保持高速缓存一致性的方案。这导致我们提出“全局目录”方法的更经济（硬件方面）、可扩展和模块化的变体。本文描述了此解决方案的协议。性能评估研究表明了这种方法可行的限制（处理器数量、共享级别）.
+
+### A Spectrum of Solutions to the Cache Coherence Problem
+
+简要回顾了已有的几种保持缓存一致性的方案。
+
+- 软件保证
+
+- 经典的方法（内存中数据永远是最新的）
+- 目录式
+- 广播/侦听式
+
+### The Two-bit Directory Scheme
+
+
+
+
+
 
 
 ## An_Adaptive_Cache_Coherence_Protocol_Optimized_for_Producer-Consumer_Sharing
 
-### 翻译
+### Abstract
 
 共享内存的多处理器在企业和科研的计算设施中是一个很重要的角色。
 远程未命中限制了共享内存应用的性能，在网络延迟越来越低的环境下，远程未命中对于处理器速度的影响显得越来越大。
@@ -67,13 +154,13 @@ sequential consistency.
 
 ## Using Preditcion to Accelerate Coherence Protocols
 
-#### Abstract
+### Abstract
 
 大多数共享内存的多核系统都采用目录式协议(*directory protocols*)为维护缓存一致性. 为了改善这个延迟, 研究者针对特定共享模式(例如*producer-consumer*, *read-modify-write*)来对一致性协议进行优化. 该文章力求使用检测一致性活动并且触发合适动作的预测逻辑 来代替上述直接的优化方案. 
 
 该篇文章开创了通过预测(维护和评估*Cosmos*一致性消息预测器)来加速cache一致性协议的先河, 其沿用并扩展*Yeh and Patt's two-level PAp branch predictor*的思路, 来预测下一条发送至缓存块的一致性消息(*coherence message*)的消息来源和种类. 对于跑在16核多处理器的五个科学计算应用, *Cosmos*的预测成功率达到62%~93%.  这正是由于缓存块稳定的共享模式所发出的可预测一致性消息信号, *Cosmos*才会有如此高的预测正确率. 
 
-#### Conclusions
+### Conclusions
 
 该文章探索了通过预测来加速一致性协议的一种方案. 如果可以预测出未来的一致性协议动作并可以提前执行, 则整个系统将会更快执行. 
 
