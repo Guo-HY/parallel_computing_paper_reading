@@ -1,1 +1,1 @@
-# parallel_computing_paper_reading
+# BUAA 并行程序设计课程展示资料
